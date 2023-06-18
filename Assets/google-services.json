@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1097608243505",
+    "firebase_url": "https://bestfriend-1bbd0-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "bestfriend-1bbd0",
+    "storage_bucket": "bestfriend-1bbd0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1097608243505:android:1ed93c34110a1422f42810",
+        "android_client_info": {
+          "package_name": "com.my.TestSkin2"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1097608243505-2ork8u3b1123utdsvjgir8j7glkiblh1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF6EXGExcFzQRu5oHVZeWSzzrNTwT66r8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1097608243505-2ork8u3b1123utdsvjgir8j7glkiblh1.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1097608243505-ahms40c744ofakrl8bko9o2gvmdojlbf.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.my.TestSkin2"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
