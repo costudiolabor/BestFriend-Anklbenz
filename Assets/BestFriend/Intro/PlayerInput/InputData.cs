@@ -1,18 +1,13 @@
-using UnityEngine;
-using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 
-public abstract class InputData<T> : AnimatedView {
-	[SerializeField] private Button button;
-	protected UniTaskCompletionSource<T> inputCompletionSource;
-
-	public virtual void Initialize() =>
-			button.onClick.AddListener(OnSubmit);
-
-	public virtual async UniTask<T> AwaitInput() {
-		inputCompletionSource = new UniTaskCompletionSource<T>();
+public abstract class InputData : AnimatedView {
+	public abstract UniTask<string> SayAndAwaitAnswer(string message);
+	protected UniTaskCompletionSource<string> inputCompletionSource;
+	protected async UniTask<string> AwaitTask() {
+		inputCompletionSource = new UniTaskCompletionSource<string>();
 		return await inputCompletionSource.Task;
 	}
-
 	protected abstract void OnSubmit();
+	protected void OnReject() =>
+			inputCompletionSource.TrySetResult(string.Empty);
 }

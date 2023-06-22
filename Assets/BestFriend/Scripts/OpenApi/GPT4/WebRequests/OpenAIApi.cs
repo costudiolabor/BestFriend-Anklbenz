@@ -9,11 +9,8 @@ public class OpenAIApi : Requests {
 	}
 
 	private GptConnectionSettings _connectionSettings;
-	public void Initialize() {
-		if (instance is not null) return;
-
-		instance = this;
-	}
+	public void Initialize() =>
+			instance ??= this;
 
 	public async UniTask<ChatApiResponse> Send(ChatApiRequest request) {
 		if (!_connectionSettings) throw new Exception("Connection settings not found");

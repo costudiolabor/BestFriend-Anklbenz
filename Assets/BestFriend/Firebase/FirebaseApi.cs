@@ -4,6 +4,7 @@ using UnityEngine;
 using Firebase.Auth;
 using Firebase.Database;
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 
 [System.Serializable]
 public class FirebaseApi {
@@ -15,20 +16,15 @@ public class FirebaseApi {
 	private DatabaseReference _database;
 
 	public async UniTask<RequestData> ConnectAsync() {
-		try {
-			var checkDependencyResult = await FirebaseApp.CheckAndFixDependenciesAsync();
+		var checkDependencyResult = await FirebaseApp.CheckAndFixDependenciesAsync();
 
-			if (checkDependencyResult != DependencyStatus.Available)
-				return new RequestData() {isSuccess = false, errorMessage = checkDependencyResult.ToString()};
+		if (checkDependencyResult != DependencyStatus.Available)
+			return new RequestData() {isSuccess = false, errorMessage = checkDependencyResult.ToString()};
 
-			_auth = FirebaseAuth.DefaultInstance;
-			_database = FirebaseDatabase.DefaultInstance.RootReference;
+		_auth = FirebaseAuth.DefaultInstance;
+		_database = FirebaseDatabase.DefaultInstance.RootReference;
 
-			return new RequestData() {isSuccess = true};
-		}
-		catch (Exception exception) {
-			return new RequestData() {errorMessage = exception.GetBaseException().Message, isSuccess = false};
-		}
+		return new RequestData() {isSuccess = true};
 	}
 
 	public async UniTask<RequestData> LinkAnonymousToEmailCredential(string email, string password) {
@@ -38,7 +34,7 @@ public class FirebaseApi {
 			return new RequestData() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<RequestData>(exception);
 		}
 	}
 
@@ -48,7 +44,7 @@ public class FirebaseApi {
 			return new RequestData() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<RequestData>(exception);
 		}
 	}
 
@@ -59,7 +55,7 @@ public class FirebaseApi {
 			return new RequestData() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<RequestData>(exception);
 		}
 	}
 
@@ -70,19 +66,19 @@ public class FirebaseApi {
 			return new RequestData() {isSuccess = authResult.User != null};
 		}
 		catch (Exception exception) {
-			return new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<RequestData>(exception);
 		}
 	}
 
-	public async UniTask<T> GetFromDatabaseAsync<T>(string databasePath) where T : RequestData {
+	public async UniTask<T> GetFromDatabaseAsync<T>(string databasePath) where T : RequestData, new() {
 		try {
 			var dataSnapShot = await _database.Child(databasePath).GetValueAsync();
 
-			if (!dataSnapShot.Exists) return null;
-			return dataSnapShot.HasChildren ? JsonUtility.FromJson<T>(dataSnapShot.GetRawJsonValue()) : (T)new RequestData() {rawDataIfExist = dataSnapShot.GetRawJsonValue()};
+			if (!dataSnapShot.Exists) throw new Exception($"On current path {databasePath}, data dont found");
+			return dataSnapShot.HasChildren ? JsonUtility.FromJson<T>(dataSnapShot.GetRawJsonValue()) : new T() {rawDataIfExist = dataSnapShot.GetRawJsonValue()};
 		}
 		catch (Exception exception) {
-			return (T)new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<T>(exception);
 		}
 	}
 
@@ -93,10 +89,17 @@ public class FirebaseApi {
 			return new RequestData() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return new RequestData() {isSuccess = false, errorMessage = exception.GetBaseException().Message};
+			return GetFaultRequestData<RequestData>(exception);
 		}
 	}
 
 	public void SingOut() =>
 			_auth.SignOut();
+
+	private T GetFaultRequestData<T>(Exception exception) where T : RequestData, new() =>
+			new T() {
+					isSuccess = false,
+					errorCode = exception.InnerException is FirebaseException firebaseException ? firebaseException.ErrorCode : 0,
+					errorMessage = exception.GetBaseException().Message
+			};
 }

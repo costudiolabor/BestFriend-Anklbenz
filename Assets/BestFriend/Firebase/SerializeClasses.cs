@@ -1,20 +1,21 @@
 using System;
 using Firebase.Auth;
 [System.Serializable]
-public class UserData : RequestData {
+public class User {
 	public string name;
 	public string gender;
 	public string age;
 }
 
 [System.Serializable]
-public class AvatarData : RequestData {
+public class Avatar  {
 	public string name;
 	public string gender;
 }
 
 [System.Serializable]
-public class AvatarMeshData : RequestData {
+public class AvatarMesh 
+{
 	//... for example
 	public int head;
 	public int body;
@@ -23,14 +24,24 @@ public class AvatarMeshData : RequestData {
 	public int eyes;
 }
 
-[Serializable]
-public class AuthData :RequestData {
-	public AuthResult authResult;
+
+[System.Serializable]
+public class UserRequest : RequestData {
+	public User data;
 }
+[System.Serializable]
+public class AvatarRequest : RequestData {
+	public Avatar data;
+} 
+[System.Serializable]
+public class AvatarMeshRequest : RequestData {
+	public AvatarMesh data;
+} 
 
 [System.Serializable]
 public class RequestData {
 	public bool isSuccess;
+	public int errorCode; // cast to enum AuthError can get error description
 	public string errorMessage;
 	public string rawDataIfExist;
 }

@@ -1,15 +1,12 @@
 using UnityEngine;
 
-public class InputOption : InputData<string> {
+public class InputOption : AnimatedView {
 	[SerializeField] private UIScroller decisionScroller;
-	public override void Initialize() {
-		base.Initialize();
-	}
 
+	public string selectedOption => decisionScroller.selected.text;
+	
 	public void AddItems(string[] opinions) {
 		decisionScroller.AddItems(opinions);
 	}
-
-	protected override void OnSubmit() =>
-			inputCompletionSource.TrySetResult(decisionScroller.selected.text);
+	
 }

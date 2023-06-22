@@ -4,13 +4,16 @@ using UnityEngine;
 public class UIScroller : ItemsList<ScrollItem, string> {
 	[SerializeField] private UIStickyScroll stickyScroll;
 	[SerializeField] private string[] serializedValues;
+
 	public event Action SelectedEvent;
 	public ScrollItem selected => lastSelected.GetComponent<ScrollItem>();
 	private RectTransform lastSelected => stickyScroll.lastSelected;
-	private void Awake() =>
+	private void Awake() {
 		stickyScroll.SelectedEvent += OnSelected;
+		AddSerialized();
+	}
 
-	public void AddSerialized() {
+	private void AddSerialized() {
 		if (serializedValues.Length == 0) return;
 		AddItems(serializedValues);
 	}

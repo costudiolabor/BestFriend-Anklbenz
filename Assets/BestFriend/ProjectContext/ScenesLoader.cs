@@ -11,15 +11,13 @@ public class ScenesLoader {
     public void Initialize() =>
         instance ??= this;
 
-    public void GoToIntroScene() =>
+    public void GoToLoginScene() =>
         SceneManager.LoadScene(loginSceneIndex, LoadSceneMode.Single);
 
-    public void GoToUserScene() =>
+    public void GoToIntroScene() =>
         SceneManager.LoadScene(introSceneIndex, LoadSceneMode.Single);
 
-    public void GoToWorkArScene() =>
+    public void GoToConversationScene() =>
         SceneManager.LoadScene(conversationSceneIndex, LoadSceneMode.Single);
-
-    public void UnloadWorkArScene() =>
-		    SceneManager.UnloadSceneAsync(conversationSceneIndex);
+    
 }

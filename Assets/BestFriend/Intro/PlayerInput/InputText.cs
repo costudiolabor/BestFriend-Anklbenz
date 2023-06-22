@@ -1,26 +1,19 @@
+using System;
 using TMPro;
 using UnityEngine;
-using Cysharp.Threading.Tasks;
 
-public class InputText : InputData<string> {
+public class InputText : AnimatedView {
 	[SerializeField] private TMP_InputField inputField;
 	[SerializeField] private TMP_Text placeholderText;
 
+	public event Action ValueChangedEvent;
+	private void Awake() =>
+		inputField.onValueChanged.AddListener(delegate { ValueChangedEvent?.Invoke();});
+	
 	public string placeholder {
 		get => placeholderText.text;
 		set => placeholderText.text = value;
 	}
-
-	public override void Initialize() {
-		base.Initialize();
-		inputField.onSubmit.AddListener(delegate { OnSubmit(); });
-	}
-	public override UniTask<string> AwaitInput() {
-		inputField.text = string.Empty;
-		return base.AwaitInput();
-	}
-
-	protected override void OnSubmit() =>
-			inputCompletionSource.TrySetResult(inputField.text);
-
+	
+	public string value => inputField.text;
 }

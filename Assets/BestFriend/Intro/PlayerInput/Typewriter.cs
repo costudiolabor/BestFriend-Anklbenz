@@ -1,6 +1,8 @@
+using System;
 using TMPro;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using Random = UnityEngine.Random;
 
 public class Typewriter : AnimatedView
 {
@@ -8,6 +10,15 @@ public class Typewriter : AnimatedView
 
     [SerializeField] private int minDelayMilliseconds = 20, maxDelayMilliseconds = 200, pauseMilliseconds = 500;
     [SerializeField] private TMP_Text textField;
+    [SerializeField] private bool printOnEnable;
+    [SerializeField] private string serializedMessage;
+
+    public event Action PrintFinishedEvent;
+    
+    private async void OnEnable() {
+	    if(printOnEnable)
+		    await PrintAsNew(serializedMessage);
+    }
 
     public async UniTask PrintAsNew(string message) {
         textField.text = string.Empty;
@@ -24,6 +35,7 @@ public class Typewriter : AnimatedView
             textField.text += character;
             await UniTask.Delay(Random.Range(minDelayMilliseconds, maxDelayMilliseconds));
         }
+        
+        PrintFinishedEvent?.Invoke();
     }
-
 }

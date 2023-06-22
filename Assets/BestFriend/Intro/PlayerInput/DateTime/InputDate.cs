@@ -2,13 +2,15 @@ using System;
 using System.Linq;
 using UnityEngine;
 
-public class InputDate : InputData<DateTime> {
+[Serializable]
+public class InputDate : AnimatedView {
 	[SerializeField] private UIScroller daysScroll, monthScroll, yearsScroll;
-	private readonly Date _date = new();
-	private string[] _yearsNames, _monthNames, _dayNames;
+	public string selectedDate => /*DateTime.Parse(*/daysScroll.selected.text + monthScroll.selected.text + yearsScroll.selected.text/*)*/;
 
-	public override void Initialize() {
-		base.Initialize();
+	private readonly Date _date = new();
+	private string[] _yearsNames, _monthNames;
+
+	public void Initialize() {
 		_yearsNames = _date.GetYears().ToArray();
 		_monthNames = _date.GetMonths().ToArray();
 
@@ -19,24 +21,16 @@ public class InputDate : InputData<DateTime> {
 		yearsScroll.SelectedEvent += UpdateDays;
 		monthScroll.SelectedEvent += UpdateDays;
 	}
-	
-	protected override void OnSubmit() =>
-		inputCompletionSource.TrySetResult(GetDate());
 
 	private void UpdateDays() {
 		var year = yearsScroll.selected;
 
 		var currentValue = daysScroll.GetSelectedIndex() + 1;
-		var daysCount = _date.DayInMonth(Int32.Parse(year.text), monthScroll.GetSelectedIndex() + 1);
+		var daysCount = _date.DayInMonth(int.Parse(year.text), monthScroll.GetSelectedIndex() + 1);
 
 		if (currentValue > daysCount)
 			daysScroll.SelectByIndex(daysCount - 1);
 
 		daysScroll.ShowRange(0, daysCount + 1);
-	}
-
-	private DateTime GetDate() {
-		var dateString = daysScroll.selected.text + monthScroll.selected.text + yearsScroll.selected.text;
-		return DateTime.Parse(dateString);
 	}
 }

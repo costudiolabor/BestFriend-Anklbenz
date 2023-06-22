@@ -5,13 +5,20 @@ public class Boot : MonoBehaviour {
 
 	private async void Awake() {
 		await project.Initialize();
-		/*DatabaseApi.instance.SingOut();
-		return;*/
-	if(!DatabaseApi.instance.isSigned)
-		 await DatabaseApi.instance.CreateAsAnonymousAsync();
 		
+	DatabaseApi.instance.SingOut();
+		project.scenario.Select();
+		
+		DontDestroyOnLoad(project);
+
+
+		/*
+		if(!DatabaseApi.instance.isSigned)
+			 await DatabaseApi.instance.CreateAsAnonymousAsync();
+			 */
+
 //		await FirebaseApi.instance.RegistrationWithEmailAndPassword("aabb.cc", "111");
-		if (DatabaseApi.instance.isSigned) {
+		/*if (DatabaseApi.instance.isSigned) {
 			await DatabaseApi.instance.SetUserData(new UserData() {age = "1", gender = "female", name = "Grisha1"});
 			await DatabaseApi.instance.SetAvatarData(new AvatarData() {gender = "male", name = " Petya"});
 			await DatabaseApi.instance.SetAvatarMeshData(new AvatarMeshData() {hair = 2, head = 1, body = 3, eyes = 21, legs = 24});
@@ -20,13 +27,17 @@ public class Boot : MonoBehaviour {
 			var mesh = await DatabaseApi.instance.GetAvatarMeshData();
 			var openAi = await DatabaseApi.instance.GetAiKey();
 			var google = await DatabaseApi.instance.GetSpeechKey();
-		}
-		
+		}*/
+
 		//	await DatabaseApi.instance.SignInWithEmailAndPasswordAsync("aa@bb.cc", "111111");
 		//await DatabaseApi.instance.Ddd();
 		//"aabb@eee.cc", "password"
-		var r=await DatabaseApi.instance.LinkAnonymousToEmailCredential("aabb@eee.cc1","password");
-//		ScenesLoader.instance.GoToIntroScene();
-		DontDestroyOnLoad(project);
+//		var r=await DatabaseApi.instance.LinkAnonymousToEmailCredential("aabb@eee.cc1","password");
 	}
+	/*private void SelectScene() {
+		if (DatabaseApi.instance.isSigned)
+			Debug.Log("Go to next");
+		else
+			ScenesLoader.instance.GoToLoginScene();
+	}*/
 }

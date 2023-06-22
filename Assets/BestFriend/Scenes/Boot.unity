@@ -198,9 +198,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scenesLoader:
-    loginSceneIndex: 0
-    introSceneIndex: 1
-    conversationSceneIndex: 2
+    loginSceneIndex: 1
+    introSceneIndex: 2
+    conversationSceneIndex: 3
 --- !u!4 &1717606487
 Transform:
   m_ObjectHideFlags: 0
