@@ -6,7 +6,7 @@ public class Project : MonoBehaviour {
 	public ScenesLoader scenesLoader;
 	public DatabaseApi firebase;
 	public GameScenario scenario;
-//	public SessionCache sessionCache;
+   public SessionCache sessionCache;
 
 	public async UniTask Initialize() {
 		await firebase.Initialize();

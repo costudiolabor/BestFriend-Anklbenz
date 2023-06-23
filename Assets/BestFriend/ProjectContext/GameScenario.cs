@@ -1,32 +1,38 @@
 using System;
-using UnityEngine;
 
-public class GameScenario : IDisposable
-{
+public class GameScenario : IDisposable {
+	private bool isSingedToFirebase => DatabaseApi.instance.isSigned;
 	public void Initialize() {
 		Auth.SignedInEvent += OnSignedIn;
 		Auth.SignedUpEvent += OnSignedUp;
+		Intro.IntroReadyEvent += OnIntroReady;
 	}
 
-	public void Select() {
-		if (DatabaseApi.instance.isSigned)
-			Debug.Log("Go to next");
+	public async void SelectScenario() {
+		await SessionCache.instance.GetInitializeData();
+
+		if (isSingedToFirebase)
+			OnSignedIn();
 		else
-			ScenesLoader.instance.GoToLoginScene();
+			ScenesLoader.instance.GotoAuthScene();
 	}
-	
-	private void OnSignedUp() {
-		Debug.Log("SignedUp");
-	   // ScenesLoader.instance.GoToIntroScene();	
+
+	private void OnSignedUp() =>
+			ScenesLoader.instance.GotoIntroScene();
+
+	private void OnSignedIn() {
+		if (SessionCache.instance.isIntroReady)
+			OnIntroReady();
+		else
+			ScenesLoader.instance.GotoIntroScene();
 	}
-	private async void OnSignedIn() {
-		Debug.Log("SignedIn");
-		var user = await DatabaseApi.instance.GetUserData();
-	//	if(user)
-	}
-	
+
+	private void OnIntroReady() =>
+			ScenesLoader.instance.GotoConversationScene();
+
 	public void Dispose() {
 		Auth.SignedInEvent -= OnSignedIn;
 		Auth.SignedUpEvent -= OnSignedUp;
+		Intro.IntroReadyEvent -= OnIntroReady;
 	}
 }

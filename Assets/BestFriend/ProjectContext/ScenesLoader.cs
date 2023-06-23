@@ -11,13 +11,13 @@ public class ScenesLoader {
     public void Initialize() =>
         instance ??= this;
 
-    public void GoToLoginScene() =>
+    public void GotoAuthScene() =>
         SceneManager.LoadScene(loginSceneIndex, LoadSceneMode.Single);
 
-    public void GoToIntroScene() =>
+    public void GotoIntroScene() =>
         SceneManager.LoadScene(introSceneIndex, LoadSceneMode.Single);
 
-    public void GoToConversationScene() =>
+    public void GotoConversationScene() =>
         SceneManager.LoadScene(conversationSceneIndex, LoadSceneMode.Single);
     
 }

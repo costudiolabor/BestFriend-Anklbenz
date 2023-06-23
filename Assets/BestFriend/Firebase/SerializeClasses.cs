@@ -1,5 +1,3 @@
-using System;
-using Firebase.Auth;
 [System.Serializable]
 public class User {
 	public string name;
@@ -11,6 +9,7 @@ public class User {
 public class Avatar  {
 	public string name;
 	public string gender;
+	public string type;
 }
 
 [System.Serializable]

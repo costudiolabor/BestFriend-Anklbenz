@@ -7,7 +7,7 @@ public class Boot : MonoBehaviour {
 		await project.Initialize();
 		
 	DatabaseApi.instance.SingOut();
-		project.scenario.Select();
+		project.scenario.SelectScenario();
 		
 		DontDestroyOnLoad(project);
 
