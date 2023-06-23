@@ -7,7 +7,7 @@ public class Intro : MonoBehaviour {
 	[SerializeField] private InputOpinionLabel genderLabel;
 	[SerializeField] private InputLookLabel lookLabel;
 
-	public static event Action IntroReadyEvent; 
+	public static event Action IntroReadyEvent;
 	private string _playerName, _playerBirthdate, _playerGender, _aiName, _aiLook;
 
 	private void Awake() {

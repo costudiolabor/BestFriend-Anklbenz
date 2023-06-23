@@ -12,8 +12,7 @@ public class Project : MonoBehaviour {
 		await firebase.Initialize();
 		scenesLoader.Initialize();
 		openOpenAIApi.Initialize();
-		
-		scenario = new GameScenario();
+		sessionCache.Initialize();
 		scenario.Initialize();
 	}
 }

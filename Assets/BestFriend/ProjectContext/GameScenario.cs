@@ -1,7 +1,8 @@
 using System;
 
+[System.Serializable]
 public class GameScenario : IDisposable {
-	private bool isSingedToFirebase => DatabaseApi.instance.isSigned;
+	private bool isSingedToFirebase => DatabaseApi.instance.user != null;
 	public void Initialize() {
 		Auth.SignedInEvent += OnSignedIn;
 		Auth.SignedUpEvent += OnSignedUp;
@@ -9,12 +10,14 @@ public class GameScenario : IDisposable {
 	}
 
 	public async void SelectScenario() {
-		await SessionCache.instance.GetInitializeData();
 
-		if (isSingedToFirebase)
+		if (isSingedToFirebase) {
+			await SessionCache.instance.GetInitializeData();
 			OnSignedIn();
-		else
+		}
+		else {
 			ScenesLoader.instance.GotoAuthScene();
+		}
 	}
 
 	private void OnSignedUp() =>

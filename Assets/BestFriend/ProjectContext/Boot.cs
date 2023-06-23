@@ -6,7 +6,7 @@ public class Boot : MonoBehaviour {
 	private async void Awake() {
 		await project.Initialize();
 		
-	DatabaseApi.instance.SingOut();
+	//  DatabaseApi.instance.SingOut();
 		project.scenario.SelectScenario();
 		
 		DontDestroyOnLoad(project);
