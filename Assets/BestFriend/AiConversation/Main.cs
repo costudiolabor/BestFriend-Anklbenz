@@ -1,11 +1,10 @@
-using System;
 using UnityEngine;
 
 public class Main : MonoBehaviour {
 	[SerializeField] private Messenger messenger;
-
-	private void Awake() {
-		messenger.Initialize();
+	
+	private async void Awake() {
+		await messenger.Initialize();
 	}
 
 	private void FixedUpdate() {

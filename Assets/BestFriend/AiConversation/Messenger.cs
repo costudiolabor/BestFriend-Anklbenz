@@ -1,77 +1,62 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-[System.Serializable]
+[Serializable]
 public class Messenger {
-	[SerializeField] private MessengerView view;
-	private readonly RequestsBuilder _requestBuilder = new();
-	private LimitsCounter _limitCounter = new();
-	private bool _initialized;
+	[SerializeField] private MessageBoard messageBoard;
+	[SerializeField] private MessageInput messageInput;
+	[SerializeField] private LimitsView limitsView;
 
+	private readonly RequestsSender _requestSender = new();
+	private readonly LimitsCounter _limitsCounter = new();
 
-	public async void Initialize() {
-		if (_initialized) return;
-
+	public async UniTask Initialize() {
 		var chatSettings = await DatabaseApi.instance.GetChatSettings();
 		var currentData = await DatabaseApi.instance.GetUserData();
-		_requestBuilder.Initialize(chatSettings.data, currentData.data);
-		
-		_limitCounter.RefreshSuccessEvent += OnLimitsUpdated;
-		await _limitCounter.Initialize(chatSettings.data.conversationSettings);
-	 	await _limitCounter.Refresh();
-		
-		view.SendEvent += SendAsync;
 
-		_initialized = true;
+		_requestSender.Initialize(chatSettings.data, currentData.data);
+		_limitsCounter.Initialize(chatSettings.data.freeLimits);
+		_limitsCounter.RefreshEvent += OnRefresh;
+		
+		await _limitsCounter.Refresh();
+		
+		messageInput.SendEvent += SendAsync;
 	}
-
 	private async void SendAsync() {
-	var f =	await DatabaseApi.instance.GetActualLimits();
+		if (_limitsCounter.isEmpty) return;
+		if (messageInput.inputIsEmpty) return;
 	
-		
-		var sendText = view.inputText;
-		if (string.IsNullOrWhiteSpace(sendText)) return;
-		if (!_limitCounter.hasLimit) return;
+		var typedMessage = messageInput.inputText;
 
-		var userMessage = _requestBuilder.CreateUserMessage(sendText);
-		var request = _requestBuilder.CreateAiRequest(userMessage);
+		messageInput.isEnabled = false;
+		messageBoard.CreateUserMessage(typedMessage);
 
-		view.isSendControlsEnabled = false;
-		view.messageBoard.TypeUserMessage(userMessage.content);
+		var aiResponse = await _requestSender.SendRequestAsync(typedMessage);
 
-		var aiResponseRequest = await DatabaseApi.instance.SendAiRequest(request);
-		if (!aiResponseRequest.isSuccess) return;
+		messageBoard.CreateCompanionMessage(aiResponse);
+		messageInput.ClearInput();
 
-		await _limitCounter.Refresh();
+		await _limitsCounter.Refresh();
 
-		var aiResponseMessage = aiResponseRequest.data.choices[0].message;
-
-		_requestBuilder.AddHistory(userMessage);
-		_requestBuilder.AddHistory(aiResponseMessage);
-
-		view.messageBoard.TypeCompanionMessage(aiResponseMessage.content);
-		view.isSendControlsEnabled = true;
-		view.ClearInput();
+		messageInput.isEnabled = true;
 	}
-
-	public void Open() => view.Open();
-	public void Close() => view.Close();
 
 	public async void FixedUpdate_SystemCall() {
-		if (!_initialized) return;
-		if (_limitCounter.hasMax) return;
+		if (!_limitsCounter.isReady || _limitsCounter.isMax) return;
 
-		var timeNExtIter = _limitCounter.timeToNextIteration;
-		var now = DateTime.UtcNow;
-		var timeSpan = _limitCounter.timeToNextIteration.Subtract(DateTime.UtcNow);
-		view.requestsText = $"{timeSpan.Minutes} : {timeSpan.Seconds} ";
-	
-		if (timeSpan.TotalSeconds <= 0)
-			await _limitCounter.Refresh();
+		var timesLeft = TimeSpan.FromMilliseconds(_limitsCounter.timeLeftToNextMilliseconds);
+
+		if (timesLeft.TotalSeconds <= 0)
+			await _limitsCounter.Refresh();
+		else
+			limitsView.timerText = timesLeft.ToString(@"mm\:ss");
 	}
 
-	private void OnLimitsUpdated() {
-		view.requestsText = _limitCounter.requestsAvailable.ToString();
-		view.timerVisible = !_limitCounter.hasMax;
+	private void OnRefresh() {
+		limitsView.requestsText = _limitsCounter.requestsAvailable.ToString();
+		if (_limitsCounter.isMax)
+			limitsView.timerText = "Full";
+		//limitsView.timerVisible = !;
 	}
 }

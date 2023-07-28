@@ -72,10 +72,10 @@ public class DatabaseApi : FirebaseApi {
 		return await GetCloudFunctionResult<AiResponse>(AI_REQUEST_CLOUD_FUNCTION_NAME, messageJson);
 	}
 
-	public async UniTask<Request> GetActualLimits() {
+	public async UniTask<RequestData<Limits>> GetActualLimits() {
 		var cloudRequest = new CloudRequest() {uid = user.UserId};
 		var messageJson = JsonUtility.ToJson(cloudRequest);
-		return await GetCloudFunctionResult<Request>( UPDATE_LIMITS_FUNCTION_NAME, messageJson);
+		return await GetCloudFunctionResult<Limits>(UPDATE_LIMITS_FUNCTION_NAME, messageJson);
 	}
 
 	public async UniTask<RequestData<ServerTime>> GetServerTime() {

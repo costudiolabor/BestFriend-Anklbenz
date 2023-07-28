@@ -15,12 +15,12 @@ public class Chat : MonoBehaviour {
 	}
 	private async void OnSubmit(string text) {
 		input.interactable = false;
-		messageBoard.TypeUserMessage(userName, text);
+		messageBoard.CreateUserMessage(userName, text);
 		
 		var f = await gptConversation.SendUser(text);
 
 		input.interactable = true;
-		messageBoard.TypeCompanionMessage(botName, f);
+		messageBoard.CreateCompanionMessage(botName, f);
 
 		//text.text = string.Join("\n", f);
 		input.text = string.Empty;

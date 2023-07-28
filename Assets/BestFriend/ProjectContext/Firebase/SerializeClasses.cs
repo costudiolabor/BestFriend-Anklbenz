@@ -32,6 +32,7 @@ public class AvatarMesh
 [System.Serializable]
 public class ChatSettings {
 	public ConversationsSettings conversationSettings;
+	public FreeLimits freeLimits;
 	public AiRequest modelSettings;
 }
 
@@ -39,8 +40,12 @@ public class ChatSettings {
 public class ConversationsSettings {
 	public string legend;
 	public int messagesInMemory;
-	public int freeMessagesCount;
-	public long freeMessageIncrementTimeMilliseconds;
+}
+
+[System.Serializable]
+public class FreeLimits {
+	public int messagesCount;
+	public long messageIncrementTimeMilliseconds;
 }
 
 [System.Serializable]
@@ -55,8 +60,9 @@ public class RequestData<T> : Request {
 
 [System.Serializable]
 public class Limits {
-	public long lastRequest;
 	public int requestsAvailable;
+	public long lastRequest;
+	public long nowUnix;
 }
 
 [System.Serializable]
