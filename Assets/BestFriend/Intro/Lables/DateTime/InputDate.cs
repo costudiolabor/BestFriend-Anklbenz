@@ -5,7 +5,7 @@ using UnityEngine;
 [Serializable]
 public class InputDate : AnimatedView {
 	[SerializeField] private UIScroller daysScroll, monthScroll, yearsScroll;
-	public string selectedDate => /*DateTime.Parse(*/daysScroll.selected.text + monthScroll.selected.text + yearsScroll.selected.text/*)*/;
+	public string selectedDate => DateTime.Parse(daysScroll.selected.text + monthScroll.selected.text + yearsScroll.selected.text).ToString("d");
 
 	private readonly Date _date = new();
 	private string[] _yearsNames, _monthNames;

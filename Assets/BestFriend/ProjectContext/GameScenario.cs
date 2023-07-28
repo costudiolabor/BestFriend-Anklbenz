@@ -12,7 +12,7 @@ public class GameScenario : IDisposable {
 	public async void SelectScenario() {
 
 		if (isSingedToFirebase) {
-			await SessionCache.instance.GetInitializeData();
+			await SessionCache.instance.GetCurrentData();
 			OnSignedIn();
 		}
 		else {
@@ -24,7 +24,7 @@ public class GameScenario : IDisposable {
 			ScenesLoader.instance.GotoIntroScene();
 
 	private void OnSignedIn() {
-		if (SessionCache.instance.isIntroReady)
+		if (SessionCache.instance.isAllDataFilled)
 			OnIntroReady();
 		else
 			ScenesLoader.instance.GotoIntroScene();

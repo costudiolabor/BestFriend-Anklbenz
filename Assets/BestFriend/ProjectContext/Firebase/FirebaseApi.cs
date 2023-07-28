@@ -3,8 +3,8 @@ using Firebase;
 using UnityEngine;
 using Firebase.Auth;
 using Firebase.Database;
+using Firebase.Functions;
 using Cysharp.Threading.Tasks;
-using Unity.VisualScripting;
 
 [System.Serializable]
 public class FirebaseApi {
@@ -14,92 +14,114 @@ public class FirebaseApi {
 
 	private FirebaseAuth _auth;
 	private DatabaseReference _database;
+	protected FirebaseFunctions functions;
 
-	public async UniTask<RequestData> ConnectAsync() {
+	public virtual async UniTask<Request> Initialize() {
 		var checkDependencyResult = await FirebaseApp.CheckAndFixDependenciesAsync();
 
 		if (checkDependencyResult != DependencyStatus.Available)
-			return new RequestData() {isSuccess = false, errorMessage = checkDependencyResult.ToString()};
+			return new Request() {isSuccess = false, errorMessage = checkDependencyResult.ToString()};
+
+		FirebaseDatabase.DefaultInstance.SetPersistenceEnabled(false);
 
 		_auth = FirebaseAuth.DefaultInstance;
 		_database = FirebaseDatabase.DefaultInstance.RootReference;
+		functions = FirebaseFunctions.DefaultInstance;
 
-		return new RequestData() {isSuccess = true};
+		return new Request() {isSuccess = true};
 	}
 
-	public async UniTask<RequestData> LinkAnonymousToEmailCredential(string email, string password) {
+	public async UniTask<Request> LinkAnonymousToEmailCredential(string email, string password) {
 		try {
-			var credential = EmailAuthProvider.GetCredential(email, password /*"as@Msfaf.cfd", "password"*/);
+			var credential = EmailAuthProvider.GetCredential(email, password);
 			await _auth.CurrentUser.LinkWithCredentialAsync(credential);
-			return new RequestData() {isSuccess = true};
+			return new Request() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return GetFaultRequestData<RequestData>(exception);
+			return GetFaultRequest(exception);
 		}
 	}
 
-	public async UniTask<RequestData> CreateAsAnonymousAsync() {
+	public async UniTask<Request> CreateAsAnonymousAsync() {
 		try {
 			var authResult = await _auth.SignInAnonymouslyAsync();
-			return new RequestData() {isSuccess = true};
+			return new Request() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return GetFaultRequestData<RequestData>(exception);
+			return GetFaultRequest(exception);
 		}
 	}
 
-	public async UniTask<RequestData> CreateWithEmailAndPasswordAsync(string email, string password) {
+	public async UniTask<Request> CreateWithEmailAndPasswordAsync(string email, string password) {
 		try {
 			var authResult = await _auth.CreateUserWithEmailAndPasswordAsync(email, password);
 
-			return new RequestData() {isSuccess = true};
+			return new Request() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return GetFaultRequestData<RequestData>(exception);
+			return GetFaultRequest(exception);
 		}
 	}
 
-	public async UniTask<RequestData> SignInWithEmailAndPasswordAsync(string email, string password) {
+	public async UniTask<Request> SignInWithEmailAndPasswordAsync(string email, string password) {
 		try {
 			var authResult = await _auth.SignInWithEmailAndPasswordAsync(email, password);
 			//user = authResult.User;
-			return new RequestData() {isSuccess = authResult.User != null};
+			return new Request() {isSuccess = authResult.User != null};
 		}
 		catch (Exception exception) {
-			return GetFaultRequestData<RequestData>(exception);
+			return GetFaultRequest(exception);
 		}
 	}
 
-	public async UniTask<T> GetFromDatabaseAsync<T>(string databasePath) where T : RequestData, new() {
+	public async UniTask<RequestData<T>> GetObjectFromDatabaseAsync<T>(string databasePath) where T : new() {
 		try {
 			var dataSnapShot = await _database.Child(databasePath).GetValueAsync();
-
 			if (!dataSnapShot.Exists) throw new Exception($"On current path {databasePath}, data dont found");
-			return dataSnapShot.HasChildren ? JsonUtility.FromJson<T>(dataSnapShot.GetRawJsonValue()) : new T() {rawDataIfExist = dataSnapShot.GetRawJsonValue()};
+			return new RequestData<T>() {isSuccess = true, data = JsonUtility.FromJson<T>(dataSnapShot.GetRawJsonValue())};
 		}
 		catch (Exception exception) {
 			return GetFaultRequestData<T>(exception);
 		}
 	}
 
-	public async UniTask<RequestData> SaveToDatabaseAsync<T>(T data, string databasePath) {
+	public async UniTask<Request> SaveToDatabaseAsync<T>(T data, string databasePath) {
 		try {
 			var dataInJson = JsonUtility.ToJson(data);
 			await _database.Child(databasePath).SetRawJsonValueAsync(dataInJson);
-			return new RequestData() {isSuccess = true};
+			return new Request() {isSuccess = true};
 		}
 		catch (Exception exception) {
-			return GetFaultRequestData<RequestData>(exception);
+			return GetFaultRequest(exception);
 		}
 	}
-
-	public void SingOut() =>
-			_auth.SignOut();
-
-	private T GetFaultRequestData<T>(Exception exception) where T : RequestData, new() =>
-			new T() {
+	
+	public async UniTask<RequestData<T>> GetCloudFunctionResult<T>(string functionName, string jsonParam = null) where T : new() {
+		var function = functions.GetHttpsCallable(functionName);
+		try {
+			var result = await function.CallAsync(jsonParam);
+			return new RequestData<T>() {isSuccess = true, data = JsonUtility.FromJson<T>((string)result.Data)};
+		}
+		catch (Exception exception) {
+			return GetFaultRequestData<T>(exception);
+		}
+	}
+	
+	protected Request GetFaultRequest(Exception exception) =>
+			new() {
 					isSuccess = false,
 					errorCode = exception.InnerException is FirebaseException firebaseException ? firebaseException.ErrorCode : 0,
 					errorMessage = exception.GetBaseException().Message
 			};
+
+	protected RequestData<T> GetFaultRequestData<T>(Exception exception) where T : new() =>
+			new() {
+					data = new(),
+					isSuccess = false,
+					errorCode = exception.InnerException is FirebaseException firebaseException ? firebaseException.ErrorCode : 0,
+					errorMessage = exception.GetBaseException().Message
+			};
+	
+	public void SignOut() =>
+			_auth.SignOut();
 }

@@ -1,25 +1,21 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine;
 
 [System.Serializable]
 public class SessionCache {
 	public static SessionCache instance;
 
-	public UserRequest userData;
-	public AvatarRequest avatarData;
-	public AvatarMeshRequest avatarMeshData;
+	public UserData data;
 
-	public bool isUserDataFilled => !string.IsNullOrEmpty(userData.data.age) && !string.IsNullOrEmpty(userData.data.gender) && !string.IsNullOrEmpty(userData.data.name);
-	public bool isAvatarDataFilled => !string.IsNullOrEmpty(avatarData.data.gender) && !string.IsNullOrEmpty(avatarData.data.name) && !string.IsNullOrEmpty(avatarData.data.type);
+	public bool isUserDataFilled => !string.IsNullOrEmpty(data.user?.age) && !string.IsNullOrEmpty(data.user?.gender) && !string.IsNullOrEmpty(data.user?.name);
+	public bool isAvatarDataFilled => !string.IsNullOrEmpty(data.avatar?.name) && !string.IsNullOrEmpty(data.avatar?.type);
 
-	public bool isIntroReady => isAvatarDataFilled && isUserDataFilled;
+	public bool isAllDataFilled => isAvatarDataFilled && isUserDataFilled;
 
 	public void Initialize() =>
 			instance ??= this;
 
-	public async UniTask GetInitializeData() {
-		userData = await DatabaseApi.instance.GetUserData();
-		avatarData = await DatabaseApi.instance.GetAvatarData();
-		avatarMeshData = await DatabaseApi.instance.GetAvatarMeshData();
+	public async UniTask GetCurrentData() {
+		var dataRequest = await DatabaseApi.instance.GetUserData();
+		data = dataRequest.data;
 	}
 }

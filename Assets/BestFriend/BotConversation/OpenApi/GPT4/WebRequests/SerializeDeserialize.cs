@@ -59,6 +59,5 @@ namespace SerializeDeserialize {
 		public double frequency_penalty; // Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.
 		public int n; // How many chat completion choices to generate for each input message.
 		public bool stream = false;
-
 	}
 }

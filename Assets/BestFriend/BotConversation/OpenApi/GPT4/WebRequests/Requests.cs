@@ -41,9 +41,7 @@ public class Requests : DBClientDecorator {
 
         return jsonString != null ? JsonUtility.FromJson<TResult>(jsonString) : default;
     }
-
-
-
+    
     protected async UniTask<TResult?> PostFormBodyAsync<TResult>(string requestUrl, WWWForm body) where TResult : class{
         var jsonString = await Request(requestUrl, body);
 
