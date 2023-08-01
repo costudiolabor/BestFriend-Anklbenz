@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class View : MonoBehaviour
 {
-    public bool isActiveInHierarchy => gameObject.activeInHierarchy;
+    public bool isActive => gameObject.activeInHierarchy;
 
     public virtual void Open() =>
         gameObject.SetActive(true);

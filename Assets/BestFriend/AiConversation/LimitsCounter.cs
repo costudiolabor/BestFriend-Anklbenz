@@ -29,7 +29,7 @@ public class LimitsCounter {
 		_requestsAvailable = limitsRequest.data.requestsAvailable;
 
 		_timeDelta = GetLocalFromGlobalTimeDelta(limitsRequest.data.nowUnix);
-		_nextIterationTimeInLocal = (limitsRequest.data.nowUnix + _timeDelta) + _incrementTimeMilliseconds;
+		_nextIterationTimeInLocal = (_lastUpdateTime + _timeDelta) + _incrementTimeMilliseconds;
 
 		isReady = true;
 		RefreshEvent?.Invoke();
