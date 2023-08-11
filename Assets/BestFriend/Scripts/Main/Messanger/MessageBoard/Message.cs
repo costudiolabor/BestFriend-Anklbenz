@@ -2,18 +2,15 @@ using System;
 using TMPro;
 using UnityEngine;
 
-public class Message : MonoBehaviour
-{
-    [SerializeField] private TMP_Text senderText, contentText, timeText;
- 
-    public void Set(string sender, string content, double time) {
-        senderText.text = sender;
-        contentText.text = content;
-        timeText.text = UnixTimeStampToDateTime(time).ToShortTimeString();
-    }
+public class Message : AnimatedView {
+	[SerializeField] private TMP_Text senderText, contentText, timeText;
 
-    private static DateTime UnixTimeStampToDateTime(double unixTimeStamp) {
-        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        return dateTime.AddSeconds(unixTimeStamp).ToLocalTime();
-    }
+	public void Set(string content, string sender = "", double time = 0) {
+		contentText.text = content;
+
+		if (!string.IsNullOrWhiteSpace(sender))
+			senderText.text = sender;
+		if (time > 0)
+			timeText.text = Utils.UnixTimeToLocalTime(time).ToShortTimeString();
+	}
 }

@@ -1,4 +1,5 @@
 using System;
+using Enums;
 [System.Serializable]
 
 public class Look {
@@ -82,4 +83,11 @@ public class Request {
 	public bool isSuccess;
 	public int errorCode; // cast to enum AuthError can get error description
 	public string errorMessage;
+}
+
+[Serializable]
+public class HistoryMessage {
+	public HistoryMessageType role;
+	public string message;
+	public long unixTime;
 }

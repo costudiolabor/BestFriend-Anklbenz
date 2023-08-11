@@ -5,5 +5,9 @@ namespace Enums {
 		Wife,
 		Mentor
 	}
-	
+
+	public enum HistoryMessageType {
+		User = 0,
+		Companion = 1
+	}
 }
