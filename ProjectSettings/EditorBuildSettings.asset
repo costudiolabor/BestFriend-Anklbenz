@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/BestFriend/Scenes/Authorize.unity
     guid: be6c44922bde1b240936dcbdd086a605
   - enabled: 1
-    path: Assets/BestFriend/Scenes/Intro.unity
+    path: Assets/BestFriend/Scenes/Meet.unity
     guid: a534ae28f6567814289b11d44371f978
   - enabled: 0
     path: Assets/Scenes/SceneSkin.unity
