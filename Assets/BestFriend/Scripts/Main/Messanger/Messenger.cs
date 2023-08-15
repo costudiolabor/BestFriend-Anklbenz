@@ -9,8 +9,17 @@ public class Messenger {
 	[SerializeField] private MessageBoard messageBoard;
 	[SerializeField] private MessageInput messageInput;
 	[SerializeField] private LimitsView limitsView;
-	[SerializeField] private Button closeButton;
 
+	public bool messageBoardIsActive {
+		get => messageBoard.gameObject.activeInHierarchy;
+		set {
+			if(value)
+				messageBoard.Open();
+			else
+				messageBoard.Close();
+		}
+	}
+	
 	private readonly RequestsSender _requestSender = new();
 	private readonly LimitsCounter _limitsCounter = new();
 	private readonly History _history = new();
@@ -18,10 +27,11 @@ public class Messenger {
 	private long currentUnix => ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
 
 	public async UniTask Initialize(ChatSettings chatSettings, UserData userData) {
+		messageBoard.ForceClose();
 		_requestSender.Initialize(chatSettings, userData);
 		_limitsCounter.Initialize(chatSettings.freeLimits);
 		_limitsCounter.RefreshEvent += OnRefresh;
-		closeButton.onClick.AddListener(OnCloseClick);
+		
 		LoadHistory();
 		await _limitsCounter.Refresh();
       
@@ -81,10 +91,4 @@ public class Messenger {
 			limitsView.timerText = "Full";
 	}
 
-	private void OnCloseClick() {
-		if (messageBoard.isActive)
-			messageBoard.Close();
-		else
-			messageBoard.Open();
-	}
 }

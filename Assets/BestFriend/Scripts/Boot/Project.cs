@@ -12,6 +12,6 @@ public class Project : MonoBehaviour {
 		await _firebase.Initialize();
 		scenesLoader.Initialize();
 		sessionCache.Initialize();
-		scenario.Initialize();
+		await scenario.Initialize();
 	}
 }

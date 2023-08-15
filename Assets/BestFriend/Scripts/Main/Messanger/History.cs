@@ -11,6 +11,8 @@ public class History {
 	private long unixUtcNow => ((DateTimeOffset)DateTime.UtcNow).ToUnixTimeMilliseconds();
 
 	public IEnumerable<HistoryMessage> Get() {
+		if (!File.Exists(path)) return new HistoryMessage[] {};
+		
 		var fileLines = File.ReadAllLines(path);
 		var historyList = new List<HistoryMessage>();
 		
